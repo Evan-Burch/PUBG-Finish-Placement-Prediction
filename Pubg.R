@@ -1,18 +1,25 @@
 library(readr)
-pubg <- read_csv("train_V2.csv")
+train_V2 <- read_csv("train_V2.csv")
 pubg_test <- read_csv("test_V2.csv")
 
-hist(pubg$damageDealt)
-hist(pubg$kills)
-hist(pubg$matchDuration)
-hist(pubg$walkDistance)
+hist(train_V2$damageDealt)
+hist(train_V2$kills)
+hist(train_V2$matchDuration)
+hist(train_V2$walkDistance)
 
-summary(pubg)
+summary(train_V2)
 summary(pubg_test)
 
-plot(pubg$kills ~ pubg$winPlacePerc)
-plot(pubg$killPlace ~ pubg$winPlacePerc)
- 
-cor(pubg)
-solo <- subset(train_V2, select = -c(killPoints, rankPoints, winPoints))
+plot(train_V2$kills ~ train_V2$winPlacePerc)
+plot(train_V2$killPlace ~ train_V2pubg$winPlacePerc)
 
+train_V2 <- na.omit(train_V2)
+solo <- subset(train_V2 , train_V2$matchType == "solo", select = -c(killPoints, rankPoints, winPoints)) 
+
+duo <- subset(train_V2 , train_V2$matchType == "duo", select = -c(killPoints, rankPoints, winPoints)) 
+
+squad <- subset(train_V2 , train_V2$matchType == "squad", select = -c(killPoints, rankPoints, winPoints)) 
+
+solo_fpp <- subset(train_V2 , train_V2$matchType == "solo-fpp", select = -c(killPoints, rankPoints, winPoints)) 
+
+duo_fpp <- subset(train_V2 , train_V2$matchType == "duo-fpp", select = -c(killPoints, rankPoints, winPoints)) 
