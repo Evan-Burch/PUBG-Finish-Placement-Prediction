@@ -1,5 +1,7 @@
 library(readr)
 library(e1071)
+library("corrplot")
+
 train_V2 <- read_csv("train_V2.csv")
 pubg_test <- read_csv("test_V2.csv")
 
@@ -16,6 +18,10 @@ plot(train_V2$killPlace ~ train_V2pubg$winPlacePerc)
 
 train_V2 <- na.omit(train_V2)
 train_V2 <- subset(train_V2,select = -c(killPoints, rankPoints, winPoints)) 
+
+set <- subset(train_V2, select = -c(killPoints, rankPoints, winPoints, Id, groupId, matchId, matchType)) 
+corr <- cor(set, method="pearson")
+corrplot(corr, method='color')
 
 #SVR Model
 model <- svm(winPlacePerc ~ kills, train_V2)
