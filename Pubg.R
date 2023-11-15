@@ -17,7 +17,7 @@ plot(train_V2$killPlace ~ train_V2pubg$winPlacePerc)
 train_V2 <- na.omit(train_V2)
 train_V2 <- subset(train_V2,select = -c(killPoints, rankPoints, winPoints)) 
 
-
+#SVR Model
 model <- svm(winPlacePerc ~ kills, train_V2)
 
 predictedY <- predict(model, train_V2)
