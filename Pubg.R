@@ -19,7 +19,7 @@ plot(train_V2$killPlace ~ train_V2pubg$winPlacePerc)
 train_V2 <- na.omit(train_V2)
 train_V2 <- subset(train_V2,select = -c(killPoints, rankPoints, winPoints)) 
 
-set <- subset(train_V2, select = -c(killPoints, rankPoints, winPoints, Id, groupId, matchId, matchType)) 
+set <- subset(train_V2, select = -c(Id, groupId, matchId, matchType)) 
 corr <- cor(set, method="pearson")
 corrplot(corr, method='color')
 
