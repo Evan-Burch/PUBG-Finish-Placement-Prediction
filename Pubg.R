@@ -50,14 +50,4 @@ corrplot(corr, method='color')
 #points(data$X, predictedY, col = "red", pch=4)
 
 
-solo <- subset(train_V2_clean , train_V2$matchType == "solo") 
-
-duo <- subset(train_V2_clean , train_V2$matchType == "duo") 
-
-squad <- subset(train_V2_clean , train_V2$matchType == "squad") 
-
-solo_fpp <- subset(train_V2_clean , train_V2$matchType == "solo-fpp") 
-
-duo_fpp <- subset(train_V2_clean , train_V2$matchType == "duo-fpp")
-
 
