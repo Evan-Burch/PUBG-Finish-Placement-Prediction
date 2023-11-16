@@ -17,9 +17,26 @@ summary(pubg_test)
 #plot(train_V2$killPlace ~ train_V2$winPlacePerc)
 
 train_V2_clean <- na.omit(train_V2)
+train_V2_clean <- subset(train_V2, select =-c(killPoints, rankPoints, winPoints))
+train_V2_clean <- subset(train_V2_clean, train_V2_clean$matchDuration != 9)
+train_V2_clean <- subset(train_V2_clean, train_V2_clean$kills < 50)
+
+summary(train_V2_clean)
+
+
+solo <- subset(train_V2 , train_V2$matchType == "solo") 
+
+duo <- subset(train_V2 , train_V2$matchType == "duo") 
+
+squad <- subset(train_V2 , train_V2$matchType == "squad") 
+
+solo_fpp <- subset(train_V2 , train_V2$matchType == "solo-fpp") 
+
+duo_fpp <- subset(train_V2 , train_V2$matchType == "duo-fpp")
+
+squad_fpp <-  subset(train_V2 , train_V2$matchType == "duo-fpp")
 
 # This is for correlation matrix
-train_V2_clean <- subset(train_V2_clean,select = -c(killPoints, rankPoints, winPoints)) 
 
 set <- subset(train_V2_clean, select = -c(Id, groupId, matchId, matchType)) 
 corr <- cor(set, method="pearson")
