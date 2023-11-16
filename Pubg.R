@@ -2,6 +2,7 @@ library("readr")
 library("e1071")
 library("corrplot")
 
+# Read in the data
 train_V2 <- read_csv("train_V2.csv")
 pubg_test <- read_csv("test_V2.csv")
 
@@ -16,14 +17,15 @@ summary(pubg_test)
 #plot(train_V2$kills ~ train_V2$winPlacePerc)
 #plot(train_V2$killPlace ~ train_V2$winPlacePerc)
 
+# Clean NAs, unused attributes, and outliers from the data
 train_V2_clean <- na.omit(train_V2)
-train_V2_clean <- subset(train_V2, select =-c(killPoints, rankPoints, winPoints))
+train_V2_clean <- subset(train_V2_clean, select =-c(killPoints, rankPoints, winPoints))
 train_V2_clean <- subset(train_V2_clean, train_V2_clean$matchDuration != 9)
 train_V2_clean <- subset(train_V2_clean, train_V2_clean$kills < 50)
 
 summary(train_V2_clean)
 
-
+# Subset the data using the 6 match types
 solo <- subset(train_V2 , train_V2$matchType == "solo") 
 
 duo <- subset(train_V2 , train_V2$matchType == "duo") 
