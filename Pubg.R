@@ -17,6 +17,8 @@ summary(pubg_test)
 #plot(train_V2$killPlace ~ train_V2$winPlacePerc)
 
 train_V2_clean <- na.omit(train_V2)
+
+# This is for correlation matrix
 train_V2_clean <- subset(train_V2_clean,select = -c(killPoints, rankPoints, winPoints)) 
 
 set <- subset(train_V2_clean, select = -c(Id, groupId, matchId, matchType)) 
