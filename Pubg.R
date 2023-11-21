@@ -32,7 +32,14 @@ pubg_test <- train_V2_clean[-train_ind, ]
 pubg_train_reduced = pubg_train[1:10000,]
 pubg_test_reduced = pubg_test[1:2000,]
 
-summary(train_V2_clean)
+# Exploring Dataset after cleaning
+hist(pubg_train_reduced$damageDealt)
+hist(pubg_train_reduced$kills)
+hist(pubg_train_reduced$matchDuration)
+hist(pubg_train_reduced$walkDistance)
+
+summary(pubg_train_reduced)
+summary(pubg_test_reduced)
 
 # Create a dataframe with the string variables removed. This will be used in some of the Methods
 pubg_train_reduced_stringless <- subset(pubg_train_reduced, select = -c(Id, groupId, matchId, matchType))
@@ -51,6 +58,9 @@ squad_fpp <-  subset(pubg_train_reduced_stringless , pubg_train_reduced$matchTyp
 #corrplot(corr, method='color')
 
 # Method 3 - Linear/Logistic Regression
+
+model_lm <- lm(winPlacePerc ~ ., data = pubg_train_reduced)
+mae(pubg_train_reduced$winPlacePerc, predict(model_lm))
 
 # Normal Matches
 
@@ -75,9 +85,20 @@ linear_squad_fpp <- lm(winPlacePerc ~ ., data = squad_fpp)
 mae(squad_fpp$winPlacePerc, predict(linear_squad_fpp))
 
 # Method 4 - Support Vector Regression(SVR)
-#model <- svm(winPlacePerc ~ kills, train_V2)
-#predictedY <- predict(model, train_V2)
-#points(data$X, predictedY, col = "red", pch=4)
 
-# Method 5 - Decision Tree Regressor
+model_svm <- svm(winPlacePerc ~ ., pubg_train_reduced)
+predictions <-  predict(model, newdata = pubg_train_reduced)
+mae <- mean(abs(predictions - pubg_train_reduced$winPlacePerc))
+print(paste("Mean Absolute Error (MAE):", mae))
+
+# Method 5 - Random Forest Regressor
+
+set.seed(42)
+model_rf <- randomForest(formula = winPlacePerc ~ ., data = pubg_train_reduced, mtry = 10, ntree = 500)
+predictions <- predict(model_rf, newdata = pubg_test_reduced)
+mae <- mean(abs(predictions - pubg_test_reduced$winPlacePerc))
+print(paste("Mean Absolute Error (MAE):", mae))
+
+
+
 
