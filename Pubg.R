@@ -1,6 +1,7 @@
 library("readr")
 library("e1071")
 library("corrplot")
+library("Metrics")
 
 # Read in the data
 train_V2 <- read_csv("train_V2.csv")
@@ -28,19 +29,21 @@ train_ind <- sample(seq_len(nrow(train_V2_clean)), size = smp_size)
 pubg_train <- train_V2_clean[train_ind, ]
 pubg_test <- train_V2_clean[-train_ind, ]
 
-# Reduce the data to a smaller size to lower modeling times
 pubg_train_reduced = pubg_train[1:10000,]
 pubg_test_reduced = pubg_test[1:2000,]
 
 summary(train_V2_clean)
 
+# Create a dataframe with the string variables removed. This will be used in some of the Methods
+pubg_train_reduced_stringless <- subset(pubg_train_reduced, select = -c(Id, groupId, matchId, matchType))
+
 # Method 1 - Subset the data using the 6 match types
-solo <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "solo") 
-duo <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "duo") 
-squad <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "squad") 
-solo_fpp <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "solo-fpp") 
-duo_fpp <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "duo-fpp")
-squad_fpp <-  subset(pubg_train_reduced , pubg_train_reduced$matchType == "duo-fpp")
+solo <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "solo") 
+duo <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo") 
+squad <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "squad") 
+solo_fpp <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "solo-fpp") 
+duo_fpp <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo-fpp")
+squad_fpp <-  subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo-fpp")
 
 # Method 2 - Correlation matrix
 #set <- subset(train_V2_clean, select = -c(Id, groupId, matchId, matchType)) 
@@ -48,9 +51,28 @@ squad_fpp <-  subset(pubg_train_reduced , pubg_train_reduced$matchType == "duo-f
 #corrplot(corr, method='color')
 
 # Method 3 - Linear/Logistic Regression
-plot(train_V2_clean$kills ~ train_V2_clean$winPlacePerc)
-plot(train_V2_clean$killPlace ~ train_V2_clean$winPlacePerc)
-plot(solo$killPlace ~ solo$winPlacePerc)
+
+# Normal Matches
+
+linear_solo <- lm(winPlacePerc ~ ., data = solo)
+mae(solo$winPlacePerc, predict(linear_solo))
+
+linear_duo <- lm(winPlacePerc ~ ., data = duo)
+mae(duo$winPlacePerc, predict(linear_duo))
+
+linear_squad <- lm(winPlacePerc ~ ., data = squad)
+mae(squad$winPlacePerc, predict(linear_squad))
+
+# FPP Matches
+
+linear_solo_fpp <- lm(winPlacePerc ~ ., data = solo_fpp)
+mae(solo_fpp$winPlacePerc, predict(linear_solo_fpp))
+
+linear_duo_fpp <- lm(winPlacePerc ~ ., data = duo_fpp)
+mae(duo_fpp$winPlacePerc, predict(linear_duo_fpp))
+
+linear_squad_fpp <- lm(winPlacePerc ~ ., data = squad_fpp)
+mae(squad_fpp$winPlacePerc, predict(linear_squad_fpp))
 
 # Method 4 - Support Vector Regression(SVR)
 #model <- svm(winPlacePerc ~ kills, train_V2)
