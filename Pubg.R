@@ -41,48 +41,68 @@ hist(pubg_train_reduced$walkDistance)
 summary(pubg_train_reduced)
 summary(pubg_test_reduced)
 
-# Create a dataframe with the string variables removed. This will be used in some of the Methods
+# Create dataframes with the string variables removed. This will be used in some of the Methods
 pubg_train_reduced_stringless <- subset(pubg_train_reduced, select = -c(Id, groupId, matchId, matchType))
+pubg_test_reduced_stringless <- subset(pubg_test_reduced, select = -c(Id, groupId, matchId, matchType))
 
-# Method 1 - Subset the data using the 6 match types
-solo <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "solo") 
-duo <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo") 
-squad <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "squad") 
-solo_fpp <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "solo-fpp") 
-duo_fpp <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo-fpp")
-squad_fpp <-  subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo-fpp")
+### Method 1 - Subset the train and test data using the 6 match types
 
-# Method 2 - Correlation matrix
+# Train
+solo_train <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "solo") 
+duo_train <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo") 
+squad_train <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "squad") 
+solo_fpp_train <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "solo-fpp") 
+duo_fpp_train <- subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo-fpp")
+squad_fpp_train <-  subset(pubg_train_reduced_stringless , pubg_train_reduced$matchType == "duo-fpp")
+
+# Test
+solo_test <- subset(pubg_test_reduced_stringless , pubg_test_reduced$matchType == "solo") 
+duo_test <- subset(pubg_test_reduced_stringless , pubg_test_reduced$matchType == "duo") 
+squad_test <- subset(pubg_test_reduced_stringless , pubg_test_reduced$matchType == "squad") 
+solo_fpp_test <- subset(pubg_test_reduced_stringless , pubg_test_reduced$matchType == "solo-fpp") 
+duo_fpp_test <- subset(pubg_test_reduced_stringless , pubg_test_reduced$matchType == "duo-fpp")
+squad_fpp_test <-  subset(pubg_test_reduced_stringless , pubg_test_reduced$matchType == "duo-fpp")
+
+### Method 2 - Correlation matrix
 #set <- subset(train_V2_clean, select = -c(Id, groupId, matchId, matchType)) 
 #corr <- cor(set, method="pearson")
 #corrplot(corr, method='color')
 
-# Method 3 - Linear/Logistic Regression
+### Method 3 - Linear/Logistic Regression
 
+# Create a model using the train data where all matchTypes are present
 model_lm <- lm(winPlacePerc ~ ., data = pubg_train_reduced)
-mae(pubg_train_reduced$winPlacePerc, predict(model_lm))
 
-# Normal Matches
+# Use the model from above to predict the entire test data
+mae(pubg_test_reduced$winPlacePerc, predict(model_lm))
 
-linear_solo <- lm(winPlacePerc ~ ., data = solo)
-mae(solo$winPlacePerc, predict(linear_solo))
+# Use the model above to predict the test data one matchType subset at a time
+mae(solo_test$winPlacePerc, predict(model_lm))
+mae(duo_test$winPlacePerc, predict(model_lm))
+mae(squad_test$winPlacePerc, predict(model_lm))
+mae(solo_fpp_test$winPlacePerc, predict(model_lm))
+mae(duo_fpp_test$winPlacePerc, predict(model_lm))
+mae(squad_fpp_test$winPlacePerc, predict(model_lm))
 
-linear_duo <- lm(winPlacePerc ~ ., data = duo)
-mae(duo$winPlacePerc, predict(linear_duo))
+# For each matchType subset, create a its own train model and use that to predict its test data
+linear_solo <- lm(winPlacePerc ~ ., data = solo_train)
+mae(solo_test$winPlacePerc, predict(linear_solo))
 
-linear_squad <- lm(winPlacePerc ~ ., data = squad)
-mae(squad$winPlacePerc, predict(linear_squad))
+linear_duo <- lm(winPlacePerc ~ ., data = duo_train)
+mae(duo_test$winPlacePerc, predict(linear_duo))
 
-# FPP Matches
+linear_squad <- lm(winPlacePerc ~ ., data = squad_train)
+mae(squad_test$winPlacePerc, predict(linear_squad))
 
-linear_solo_fpp <- lm(winPlacePerc ~ ., data = solo_fpp)
-mae(solo_fpp$winPlacePerc, predict(linear_solo_fpp))
 
-linear_duo_fpp <- lm(winPlacePerc ~ ., data = duo_fpp)
-mae(duo_fpp$winPlacePerc, predict(linear_duo_fpp))
+linear_solo_fpp <- lm(winPlacePerc ~ ., data = solo_fpp_train)
+mae(solo_fpp_test$winPlacePerc, predict(linear_solo_fpp))
 
-linear_squad_fpp <- lm(winPlacePerc ~ ., data = squad_fpp)
-mae(squad_fpp$winPlacePerc, predict(linear_squad_fpp))
+linear_duo_fpp <- lm(winPlacePerc ~ ., data = duo_fpp_train)
+mae(duo_fpp_test$winPlacePerc, predict(linear_duo_fpp))
+
+linear_squad_fpp <- lm(winPlacePerc ~ ., data = squad_fpp_train)
+mae(squad_fpp_test$winPlacePerc, predict(linear_squad_fpp))
 
 # Method 4 - Support Vector Regression(SVR)
 
@@ -98,7 +118,6 @@ model_rf <- randomForest(formula = winPlacePerc ~ ., data = pubg_train_reduced, 
 predictions <- predict(model_rf, newdata = pubg_test_reduced)
 mae <- mean(abs(predictions - pubg_test_reduced$winPlacePerc))
 print(paste("Mean Absolute Error (MAE):", mae))
-
 
 
 
