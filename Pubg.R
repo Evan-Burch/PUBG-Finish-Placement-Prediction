@@ -21,6 +21,12 @@ train_V2_clean <- subset(train_V2_clean, select =-c(killPoints, rankPoints, winP
 train_V2_clean <- subset(train_V2_clean, train_V2_clean$matchDuration != 9)
 train_V2_clean <- subset(train_V2_clean, train_V2_clean$kills < 50)
 
+smp_size <- floor(0.80 * nrow(train_V2_clean))
+set.seed(123)
+train_ind <- sample(seq_len(nrow(train_V2_clean)), size = smp_size)
+pubg_train <- train_V2_clean[train_ind, ]
+pubg_test <- train_V2_clean[-train_ind, ]
+
 summary(train_V2_clean)
 
 # Method 1 - Subset the data using the 6 match types
