@@ -21,38 +21,36 @@ train_V2_clean <- subset(train_V2_clean, select =-c(killPoints, rankPoints, winP
 train_V2_clean <- subset(train_V2_clean, train_V2_clean$matchDuration != 9)
 train_V2_clean <- subset(train_V2_clean, train_V2_clean$kills < 50)
 
+# Use an 80 20 split to create our own train/test sets
 smp_size <- floor(0.80 * nrow(train_V2_clean))
 set.seed(123)
 train_ind <- sample(seq_len(nrow(train_V2_clean)), size = smp_size)
 pubg_train <- train_V2_clean[train_ind, ]
 pubg_test <- train_V2_clean[-train_ind, ]
 
+# Reduce the data to a smaller size to lower modeling times
 pubg_train_reduced = pubg_train[1:10000,]
 pubg_test_reduced = pubg_test[1:2000,]
 
 summary(train_V2_clean)
 
 # Method 1 - Subset the data using the 6 match types
-solo <- subset(train_V2 , train_V2$matchType == "solo") 
-
-duo <- subset(train_V2 , train_V2$matchType == "duo") 
-
-squad <- subset(train_V2 , train_V2$matchType == "squad") 
-
-solo_fpp <- subset(train_V2 , train_V2$matchType == "solo-fpp") 
-
-duo_fpp <- subset(train_V2 , train_V2$matchType == "duo-fpp")
-
-squad_fpp <-  subset(train_V2 , train_V2$matchType == "duo-fpp")
+solo <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "solo") 
+duo <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "duo") 
+squad <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "squad") 
+solo_fpp <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "solo-fpp") 
+duo_fpp <- subset(pubg_train_reduced , pubg_train_reduced$matchType == "duo-fpp")
+squad_fpp <-  subset(pubg_train_reduced , pubg_train_reduced$matchType == "duo-fpp")
 
 # Method 2 - Correlation matrix
-set <- subset(train_V2_clean, select = -c(Id, groupId, matchId, matchType)) 
-corr <- cor(set, method="pearson")
-corrplot(corr, method='color')
+#set <- subset(train_V2_clean, select = -c(Id, groupId, matchId, matchType)) 
+#corr <- cor(set, method="pearson")
+#corrplot(corr, method='color')
 
 # Method 3 - Linear/Logistic Regression
-#plot(train_V2$kills ~ train_V2$winPlacePerc)
-#plot(train_V2$killPlace ~ train_V2$winPlacePerc)
+plot(train_V2_clean$kills ~ train_V2_clean$winPlacePerc)
+plot(train_V2_clean$killPlace ~ train_V2_clean$winPlacePerc)
+plot(solo$killPlace ~ solo$winPlacePerc)
 
 # Method 4 - Support Vector Regression(SVR)
 #model <- svm(winPlacePerc ~ kills, train_V2)
@@ -60,5 +58,4 @@ corrplot(corr, method='color')
 #points(data$X, predictedY, col = "red", pch=4)
 
 # Method 5 - Decision Tree Regressor
-
 
