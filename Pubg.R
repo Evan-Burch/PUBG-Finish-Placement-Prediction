@@ -27,6 +27,9 @@ train_ind <- sample(seq_len(nrow(train_V2_clean)), size = smp_size)
 pubg_train <- train_V2_clean[train_ind, ]
 pubg_test <- train_V2_clean[-train_ind, ]
 
+pubg_train_reduced = pubg_train[1:10000,]
+pubg_test_reduced = pubg_test[1:2000,]
+
 summary(train_V2_clean)
 
 # Method 1 - Subset the data using the 6 match types
