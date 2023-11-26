@@ -106,10 +106,18 @@ mae(squad_fpp_test$winPlacePerc, predict(linear_squad_fpp))
 
 # Method 4 - Support Vector Regression(SVR)
 
-model_svm <- svm(winPlacePerc ~ ., pubg_train_reduced)
-predictions <-  predict(model, newdata = pubg_train_reduced)
+svr_train <- subset(pubg_train_reduced, select = -c(Id, groupId, matchId, matchType)) 
+svr_test <- subset(pubg_test_reduced, select = -c(Id, groupId, matchId, matchType, winPlacePerc))
+
+model_svm <- svm(winPlacePerc ~ ., svr_train)
+predictions <-  predict(model_svm,svr_test)
+
 mae <- mean(abs(predictions - pubg_train_reduced$winPlacePerc))
 print(paste("Mean Absolute Error (MAE):", mae))
+
+OptModelsvm=tune(svm, winPlacePerc ~ ., data=svr_train,ranges=list(elsilon=seq(0,1,0.1), cost=1:100))
+
+
 
 # Method 5 - Random Forest Regressor
 
